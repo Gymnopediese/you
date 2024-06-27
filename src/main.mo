@@ -7,6 +7,8 @@ import Friends "friends";
 import Cycles "mo:base/ExperimentalCycles";
 import Nat "mo:base/Nat";
 import Result "mo:base/Result";
+import Frontend "frontend/__html__";
+
 shared ({ caller = creator }) actor class UserCanister(
     yourName : Text
 ) = this {
@@ -195,5 +197,22 @@ shared ({ caller = creator }) actor class UserCanister(
         return #err("Friend not found with canisterId " # Principal.toText(canisterId));
     };
 
+    public query func http_request(_request : Frontend.Request) : async Frontend.Response {
+
+        var response : Frontend.Response = Frontend.http_request(_request);
+
+        if (Text.contains(response.headers[0].1, #text "text")) {
+            let text = Text.decodeUtf8(response.body);
+            return switch text {
+                case null response;
+                case (?val) ({
+                        body = Text.encodeUtf8(Replace.replace(val, name, Time.now() - birth));
+                        headers = response.headers;
+                        status_code = response.status_code;
+                    });
+            };
+        };
+        return response;
+    };
 
 };
