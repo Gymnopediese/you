@@ -8,6 +8,7 @@ import Cycles "mo:base/ExperimentalCycles";
 import Nat "mo:base/Nat";
 import Result "mo:base/Result";
 import Frontend "frontend/__html__";
+import Replace "replace";
 
 shared ({ caller = creator }) actor class UserCanister(
     yourName : Text
