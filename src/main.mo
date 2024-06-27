@@ -78,21 +78,25 @@ shared ({ caller = creator }) actor class UserCanister(
         }]);
     };
 
-    // public query func reboot_getName() : async Name {
-    //     return name;
-    // };
+    public query ({caller}) func reboot_getName() : async Name {
+        assert (caller == owner);
+        return name;
+    };
 
-    // public query func reboot_getOwner() : async Principal {
-    //     return owner;
-    // };
+    public query ({caller}) func reboot_getOwner() : async Principal {
+        assert (caller == owner);
+        return owner;
+    };
 
-    // public query func reboot_getBirth() : async Int {
-    //     return birth;
-    // };
+    public query ({caller}) func reboot_getBirth() : async Int {
+        assert (caller == owner);
+        return birth;
+    };
 
-    // public query func reboot_getAge() : async Int {
-    //     return Time.now() - birth;
-    // };
+    public query ({caller}) func reboot_getAge() : async Int {
+        assert (caller == owner);
+        return Time.now() - birth;
+    };
 
     public shared ({ caller }) func reboot_friends_receiveFriendRequest(
         name : Text,
