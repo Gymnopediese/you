@@ -195,4 +195,5 @@ shared ({ caller = creator }) actor class UserCanister(
         return #err("Friend not found with canisterId " # Principal.toText(canisterId));
     };
 
+
 };

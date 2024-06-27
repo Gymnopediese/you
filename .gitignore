@@ -1,3 +1,8 @@
 .dfx
 canister_ids.json
 dfx.json
+html
+src/frontend
+dfx.json
+html_to_motoko/
+makefile
