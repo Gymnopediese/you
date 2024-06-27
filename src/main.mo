@@ -2,6 +2,11 @@ import Principal "mo:base/Principal";
 import Time "mo:base/Time";
 import Timer "mo:base/Timer";
 import Text "mo:base/Text";
+import Error "mo:base/Error";
+import Frontend "frontend/__html__";
+import Replace "replace";
+import Friends "friends";
+
 shared ({ caller = creator }) actor class UserCanister(
     yourName : Text
 ) = this {
@@ -10,6 +15,8 @@ shared ({ caller = creator }) actor class UserCanister(
     public type Name = Text;
 
     stable let birth : Time.Time = Time.now();
+
+    stable var friends : [Friends.Friend] = [];
 
     let name : Name = yourName;
     let owner : Principal = creator;
@@ -68,6 +75,54 @@ shared ({ caller = creator }) actor class UserCanister(
 
     public query func reboot_getAge() : async Int {
         return Time.now() - birth;
+    };
+
+    public query ({caller}) func reboot_getFriends() : async [Friends.Friend] {
+        assert (caller == owner);
+        return friends;
+    };
+
+    public shared ({caller}) func reboot_addFriend(
+        friend_name : Name,
+        friend_principal : Principal
+    ) : async () {
+        assert (caller == owner);
+        friends := Friends.addFriend(friends, friend_name, friend_principal);
+    };
+
+     public shared ({caller}) func reboot_sendMessage(
+        target_name : Text,
+        message_content : Text
+     ) : async () {
+        assert (caller == owner);
+        friends := (await Friends.sendMessage(friends, target_name, caller, message_content));
+    };
+
+    public shared ({caller}) func reboot_recieveMessage(
+        message : Friends.PrivateMessage,
+        sender_principal : Principal
+    ) : async () {
+        assert (caller == sender_principal);
+        friends := Friends.recieveMessage(friends, sender_principal, message);
+    };
+
+
+    public query func http_request(_request : Frontend.Request) : async Frontend.Response {
+
+        var response : Frontend.Response = Frontend.http_request(_request);
+
+        if (Text.contains(response.headers[0].1, #text "text")) {
+            let text = Text.decodeUtf8(response.body);
+            return switch text {
+                case null response;
+                case (?val) ({
+                        body = Text.encodeUtf8(Replace.replace(val, name, Time.now() - birth));
+                        headers = response.headers;
+                        status_code = response.status_code;
+                    });
+            };
+        };
+        return response;
     };
 
 };
