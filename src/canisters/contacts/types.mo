@@ -1,26 +1,25 @@
 import Result "mo:base/Result";
-module Friend {
+module Contacts {
 
     public type Result<Ok, Err> = Result.Result<Ok, Err>;
 
-    public type Friend = {
+    public type Contact = {
         name : Text;
         canisterId : Principal;
     };
 
-    public type FriendRequest = {
-        id : Nat;
+    public type RelationshipRequest = {
         name : Text;
         sender : Principal;
         message : Text;
     };
 
-    public type FriendRequestError = {
-        #AlreadyFriend;
+    public type RelationshipRequestError = {
+        #AlreadyExistingRelationship;
         #AlreadyRequested;
         #NotEnoughCycles;
     };
 
-    public type FriendRequestResult = Result<(), FriendRequestError>;
+    public type RelationshipRequestResult = Result<(), RelationshipRequestError>;
 
 };
